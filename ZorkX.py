@@ -59,19 +59,20 @@ def simple_verb(word):
     r_word = 'w'
   elif word in ['e', 'east']:
     r_word = 'e'
+  elif word in ['slay', 'kill', 'hit']:
+    r_word = 'hit'
   else:
-    print("I don't understand... Try using simplier words or different commamds. Run 'commands' for a list of commands.")
-    
+    return word
   return r_word
 
 def list_commands():
-  print('n/north = go north\n
+  print('''n/north = go north\n
          e/east = go east\n
          s/south = go south\n
          w/west = go west\n
          go/walk/move/run <DIRECTION> = Move in a certain direction\n
          grab/get <ITEM> = Pick up an item\n
-         drop/throw <ITEM> = Drop a item in the room'
+         drop/throw <ITEM> = Drop a item in the room'''
 
 def parse(command):
   s_command = command.split(' ')
