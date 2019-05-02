@@ -1,11 +1,10 @@
 alive = True
 
 class player:
-  def __init__(self, name, hp, inventory):
+  def __init__(self, hp=100, inventory=[], room='r1'):
     self.hp = hp
     self.inventory = inventory
-    self.name = name
-    self.inventory = []
+    self.room = room
     print('Welcome to ZorkX! A simple parody on Zork written in Python by JonPizza! See my GitHub for more.')
     
   def add_hp(self, gained_hp):
@@ -17,7 +16,7 @@ class player:
     global alive
     self.hp -= lost_hp
     if self.hp < 0:
-      print('Oh well... It appears you have died.\nThanks for playing!')
+      print('Oh well... It appears you have died.\nThanks for playing!') # Ask Restart?
       alive = False
     
   def get_item(self, item):
@@ -37,7 +36,7 @@ class house:
     self.r4 = r4
     self.r5 = r5
     
-    self.r1 = {'items':['old glove', 'brass lantern', 'crystal sword'], 
+    self.r1 = {'items':['glove', 'lantern', 'sword'], 
               'enemies':[],
               'doors':{'s':'r3'},
               'desc':'An ornate ballroom... too bad all the decorations have been smashed and left in ruins.'}
@@ -62,6 +61,19 @@ class house:
               'desc':'A small, regular bedroom.'}
   
 dungeon = house(1, 2, 3, 4, 5) # Create Dungeon
+user = player() # Create Player
+
+def room(r):
+  if r == 'r1':
+    return dungeon.r1
+  elif r == 'r2':
+    return dungeon.r2
+  elif r == 'r3':
+    return dungeon.r3
+  elif r == 'r4':
+    return dungeon.r4
+  else: # r = r5
+    return dungeon.r5
 
 def simple_verb(word): # todo: inventory & hp/diagnose
   if word in ['grab', 'get', 'take']:
@@ -80,11 +92,13 @@ def simple_verb(word): # todo: inventory & hp/diagnose
     r_word = 'e'
   elif word in ['slay', 'kill', 'hit']:
     r_word = 'hit'
+  elif word in ['hp', 'health', 'diagnose', 'inventory']:
+    r_word = 'diagnose'
   else:
     return word
   return r_word
 
-def list_commands():
+def list_commands(): # ADD: Diagnose
   print('''n/north = go north\n
          e/east = go east\n
          s/south = go south\n
@@ -109,13 +123,13 @@ def check_drop(word):
   else:
     return False
 
-def check_hit(word):
+def check_hit(word): # The above few commands were me being a dumb*ss. Ik how to do it correct but dont wanna redo working code
   if word == 'hit':
     return True
   else:
     return False
 
-def parse(command):
+def parse(command): # Need to add some more commands here
   s_command = command.split(' ')
   simple_c = []
   for w in s_command:
@@ -133,29 +147,51 @@ def parse(command):
       else:
         return ('unknown')
 
-def run_parsed(command, curr_room):
-  print(command) #, curr_room, player
+def run_parsed(command):
+  global dungeon # TODO: Not use this as global... Don't think will be patched in time tho
+  global user
+  print(command) # TODO: Remove line
   if command[0] == 'dir':
     for key, value in curr_room['doors'].items():
       if key == command[1]:
   #placeholder, need to interact with dungeon
-        print(value)
+        user.room = command[1]
+        print(room(user.room)['desc'])
+      else:
+        print(f'I can\'t go that way!')
     #return # Doesn't exist, TODO: try/except block
   elif command[0] == 'hit':
-    for i in curr_room['enemies']:
+    for i in room(user.room)['enemies']:
       if command[1] == i:
-  #TODO: Remove enemy
-        print('killed ' + str(i))
-  elif command == 'commands':
+        room(user.room)['enemies'].remove(i)
+        print('The ' + str(i) + 'has perished.')
+      else:
+        print('I see no ' + str(i) + ' here!')
+  elif command[0] == 'commands':
     list_commands()
   elif command[0] == 'get':
     #TODO: Move item from commands[1] in house to player
-    print('get')
+    for item in room(user.room)['items']:
+      if item == command[1]:
+        user.inventory.append(item)
+        print('Grabed ' + str(command[1]) + '.')
+      else:
+        print('I see no ' + str(command[1]) + ' here!')
+  elif command[0] == 'diagnose':
+    print(f'Your status:\nHealth:{user.hp}\nInventory:')
+    for i in user.inventory:
+      print(i)
+  elif command[0] == 'drop':
+    try:
+      user.inventory.remove(command[1])
+      print('Dropped ' + str(command[1])
+    except IndexError:
+      print('I don\'t have that item!')
   else:
     #Command must = 'unknown'
     print('I dont understand!')
   
-joe = player('joe', 100, [])
+joe = player()
 
 while alive:
   joe_input = input('>>>')
