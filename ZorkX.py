@@ -1,11 +1,12 @@
 alive = True
 
+print('Welcome to ZorkX! A simple parody on Zork written in Python by JonPizza! See my GitHub for more.')
+
 class player:
   def __init__(self, hp=100, inventory=[], room='r1'):
     self.hp = hp
     self.inventory = inventory
     self.room = room
-    print('Welcome to ZorkX! A simple parody on Zork written in Python by JonPizza! See my GitHub for more.')
     
   def add_hp(self, gained_hp):
     self.hp += gained_hp
@@ -150,6 +151,7 @@ def parse(command): # Need to add some more commands here
 def run_parsed(command):
   global dungeon # TODO: Not use this as global... Don't think will be patched in time tho
   global user
+  curr_room = user.room
   print(command) # TODO: Remove line
   if command[0] == 'dir':
     for key, value in curr_room['doors'].items():
@@ -184,18 +186,16 @@ def run_parsed(command):
   elif command[0] == 'drop':
     try:
       user.inventory.remove(command[1])
-      print('Dropped ' + str(command[1])
+      print('Dropped ' + str(command[1]))
     except IndexError:
       print('I don\'t have that item!')
   else:
     #Command must = 'unknown'
     print('I dont understand!')
-  
-joe = player()
 
 while alive:
   joe_input = input('>>>')
   try:
-    run_parsed(parse(joe_input), dungeon.r1)
+    run_parsed(parse(joe_input))
   except IndexError:
     print('Add a noun!')
